@@ -44,12 +44,12 @@ def quantized_weights(weights: torch.Tensor) -> Tuple[torch.Tensor, float]:
           This value does not need to be an 8-bit integer.
     '''
     # TODO
-    scale = (torch.max(weights) - torch.min(weights)) / 255
-    zero_point = torch.round((-1) * torch.min(weights) / 255)
-    weights = torch.round(weights / scale) + zero_point
-    weights = weights.to(torch.float32)
-    print(weights)
-    return weights, scale
+    
+    min_val = torch.min(weights).item()
+    max_val = torch.max(weights).item()
+    scale = 255 / (max_val - min_val)
+    Wq = torch.clamp(torch.round(((weights) * scale)),-128, 127).to(torch.float)
+    return Wq, scale
 
 from typing import List
 
